@@ -1,7 +1,10 @@
 package falseapple.GeneralLib.helpers;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +21,32 @@ public final class IOUtil {
     static public final String ANSI_CYAN = "\u001B[36m";
     static public final String ANSI_WHITE = "\u001B[37m";
 	
+    /**
+     * 動態建立class
+     * 
+     * @param className
+     * @param params
+     * @return
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    @SuppressWarnings("unchecked")
+    static public <T> T createInstance(final String className, Object ...params) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException { 
+        final Class<T> clazz = (Class<T>) Class.forName(className);
+        final Class<?>[] types = Arrays.asList(params).stream()
+                .map(i -> i.getClass())
+                .collect(Collectors.toList())
+                .toArray(new Class<?>[params.length]);
+        
+        final Constructor<T> ctor = clazz.getConstructor(types);
+        return ctor.newInstance(params);
+    }
+    
     static public String getExceptionDetail(Exception e) {
         final StringBuffer stringBuffer = new StringBuffer(e.toString() + "\n");
         StackTraceElement[] messages = e.getStackTrace();
