@@ -3,11 +3,11 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>com.mega</groupId>
+    <groupId>com.falseapple.general</groupId>
     <version>0.0.1</version>
-    <artifactId>GeneralLib</artifactId>
+    <artifactId>general-lib</artifactId>
     <packaging>jar</packaging>
-    <name>GeneralLib</name>
+    <name>General Libraries</name>
     <url>http://maven.apache.org</url>
 
     <properties>
