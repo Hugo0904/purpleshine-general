@@ -1,4 +1,4 @@
-# GeneralLib
+# General Libraries
 共用libraries
 
 -----
@@ -13,7 +13,7 @@ JDK 10
 ---
 # 使用方式
 
-需手動下達
+~需手動下達~
 ```
-mvn install:install-file -Dfile=lib/jacksum-1.3.jar -DgroupId=jonelo -DartifactId=jacksum -Dversion=1.3 -Dpackaging=jar`
+ mvn install:install-file -Dfile=lib/jacksum-1.3.jar -DgroupId=jonelo -DartifactId=jacksum -Dversion=1.3 -Dpackaging=jar`
 ```
