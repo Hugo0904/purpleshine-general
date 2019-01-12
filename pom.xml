@@ -5,7 +5,7 @@
     
     <groupId>com.purpleshine.general</groupId>
     <version>0.0.1</version>
-    <artifactId>general-lib</artifactId>
+    <artifactId>purpleshine-general</artifactId>
     <packaging>jar</packaging>
     <name>General Libraries</name>
     <url>http://maven.apache.org</url>
