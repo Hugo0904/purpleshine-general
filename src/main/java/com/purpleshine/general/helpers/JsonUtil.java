@@ -1,6 +1,11 @@
 package com.purpleshine.general.helpers;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -17,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.google.common.collect.Lists;
 
 public final class JsonUtil {
     static private final ObjectMapper objectMapper = new ObjectMapper()
@@ -220,5 +226,142 @@ public final class JsonUtil {
         return Optional.empty();
     }
     
+    /**
+     * 排序內容
+     * 
+     * @param tree
+     */
+    static public void sort(JsonNode tree) {
+        if (tree.isObject()) {
+            sortObject(tree);
+        } else if (tree.isArray()) {
+            sortArray(tree);
+        }
+    }
     
+    /**
+     * 排序物件
+     * 
+     * @param tree
+     */
+    static public void sortObject(JsonNode tree) {
+        List<String> asList = Lists.newArrayList(tree.fieldNames());
+        Collections.sort(asList);
+        LinkedHashMap<String, JsonNode> map = new LinkedHashMap<String, JsonNode>();
+        for (String f : asList) {
+            JsonNode value = tree.get(f);
+            map.put(f, value);
+        }
+        ((ObjectNode) tree).removeAll();
+        ((ObjectNode) tree).setAll(map);
+    }
+    
+    /**
+     * 排序array
+     * 
+     * @param tree
+     */
+    static public void sortArray(JsonNode tree) {
+        for (JsonNode jsonNode : tree) {
+            sort(jsonNode);
+        }
+
+        List<JsonNode> list = Lists.newArrayList(((ArrayNode) tree).iterator());
+        Collections.sort(list, new JsonNodeComparator());
+        ((ArrayNode) tree).removeAll();
+        ((ArrayNode) tree).addAll(list);
+    }
+    
+    public static class JsonNodeComparator implements Comparator<JsonNode> {
+        public int compare(JsonNode o1, JsonNode o2) {
+            if (o1 == null && o2 == null) {
+                return 0;
+            }
+
+            if (o1 == null) {
+                return -1;
+            }
+            if (o2 == null) {
+                return 1;
+            }
+
+            if (o1.isObject() && o2.isObject()) {
+                return compObject(o1, o2);
+            } else if (o1.isArray() && o2.isArray()) {
+                return compArray(o1, o2);
+            } else if (o1.isValueNode() && o2.isValueNode()) {
+                return compValue(o1, o2);
+            } else {
+                return 1;
+            }
+        }
+
+        private int compValue(JsonNode o1, JsonNode o2) {
+
+            if (o1.isNull()) {
+                return -1;
+            }
+
+            if (o2.isNull()) {
+                return 1;
+            }
+
+            if (o1.isNumber() && o2.isNumber()) {
+                return o1.bigIntegerValue().compareTo(o2.bigIntegerValue());
+            }
+
+            return o1.asText().compareTo(o2.asText());
+        }
+
+        private int compArray(JsonNode o1, JsonNode o2) {
+
+            int c = ((ArrayNode) o1).size() - ((ArrayNode) o2).size();
+            if (c != 0) {
+                return c;
+            }
+            for (int i = 0; i < ((ArrayNode) o1).size(); i++) {
+                c = compare(o1.get(i), o2.get(i));
+                if (c != 0) {
+                    return c;
+                }
+            }
+
+            return 0;
+        }
+
+        private int compObject(JsonNode o1, JsonNode o2) {
+
+            String id1 = o1.get("id") == null ? null : o1.get("id").asText();
+            String id2 = o2.get("id") == null ? null : o2.get("id").asText();
+            if (id1 != null) {
+                int c = id1.compareTo(id2);
+                if (c != 0) {
+                    return c;
+                }
+            }
+            int c = ((ObjectNode) o1).size() - ((ObjectNode) o2).size();
+            if (c != 0) {
+                return c;
+            }
+
+            Iterator<String> fieldNames1 = ((ObjectNode) o1).fieldNames();
+            Iterator<String> fieldNames2 = ((ObjectNode) o2).fieldNames();
+            for (; fieldNames1.hasNext();) {
+                String f = fieldNames1.next();
+
+                c = f.compareTo(fieldNames2.next());
+                if (c != 0) {
+                    return c;
+                }
+
+                JsonNode n1 = o1.get(f);
+                JsonNode n2 = o2.get(f);
+                c = compare(n1, n2);
+                if (c != 0) {
+                    return c;
+                }
+            }
+            return 0;
+        }
+    }
 }
