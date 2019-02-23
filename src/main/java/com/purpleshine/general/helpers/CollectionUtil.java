@@ -5,20 +5,33 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public final class CollectionUtil {
 	
+    /**
+     * 合併兩個array
+     * @param arrays
+     * @return
+     */
+    public static <T> T[] mergeArray(T[] array1, T[] array2)
+    {
+        return ArrayUtils.addAll(array1, array2);
+    }
+    
     /**
      * 合併多個array
      * @param arrays
      * @return
      */
-    static public Object[] mergeArray(Object[]... arrays) {
-        return Stream.of(arrays)
+    @SuppressWarnings("unchecked")
+    static public <T> T[] mergeArray(T[]... arrays) {
+        return (T[]) Stream.of(arrays)
                 .filter(Objects::nonNull)
                 .flatMap(Stream::of)
                 .toArray(Object[]::new);
@@ -29,7 +42,7 @@ public final class CollectionUtil {
      * @param array - 陣列
      * @return - LIST
      */
-    static public <T> ArrayList<T>  arrayToList(T[] array) {
+    static public <T> ArrayList<T> arrayToList(T[] array) {
         ArrayList<T> list = new ArrayList<>();
         for (T t : array) {
             list.add(t);

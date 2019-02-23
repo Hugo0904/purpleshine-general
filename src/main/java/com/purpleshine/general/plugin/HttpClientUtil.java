@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +36,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -94,7 +98,6 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
-
 public final class HttpClientUtil {
     
     // 一般 GET
@@ -130,6 +133,8 @@ public final class HttpClientUtil {
         ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     };
     
+    private Map<String, RequestConfig> requestConfigs = new HashMap<>();
+    
     private final HttpClientConfig config;
     
     private CloseableHttpClient httpclient;
@@ -153,6 +158,16 @@ public final class HttpClientUtil {
      */
     public void setOnException(Consumer<Entry<Throwable, String>> onException) {
         this.onException = onException;
+    }
+    
+    public HttpClientUtil setRequestConfig(String url, RequestConfig config) {
+        this.requestConfigs.put(url, config);
+        return this;
+    }
+    
+    public HttpClientUtil setCredentials(AuthScope authscope, Credentials credentials) {
+        this.credentialsProvider.setCredentials(authscope, credentials);
+        return this;
     }
 
     /**
@@ -285,6 +300,7 @@ public final class HttpClientUtil {
         cookieStore = new BasicCookieStore();
         // Use custom credentials provider if necessary.
         credentialsProvider = new BasicCredentialsProvider();
+        
         // Create global request configuration
         defaultRequestConfig = RequestConfig.custom()
             .setSocketTimeout(config.getMaxConnectTimeout()) // Https超時
@@ -589,7 +605,7 @@ public final class HttpClientUtil {
      */
     private ResponseData execute(final HttpRequestBase httpType, final Header[] headers) throws IOException {
         if (httpclient == null) throw new IOException("client 未打開");
-        return execute(httpType, headers, getBaseRequestBuilder()); 
+        return execute(httpType, headers, getBaseRequestBuilder(httpType.getURI().getHost())); 
     }
     
     /**
@@ -606,9 +622,11 @@ public final class HttpClientUtil {
             if (Objects.nonNull(headers)) httpType.setHeaders(headers);
              // Execution context can be customized locally.
             final HttpClientContext context = HttpClientContext.create();
+            
             // Contextual attributes set the local context level will take
             // precedence over those set at the client level.
             context.setCredentialsProvider(credentialsProvider);
+            
             final Instant start = Instant.now();
             try (CloseableHttpResponse response = httpclient.execute(httpType, context)) {
                 // Once the request has been executed the local context can
@@ -638,6 +656,18 @@ public final class HttpClientUtil {
         // Request configuration can be overridden at the request level.
         // They will take precedence over the one set at the client level.
         return RequestConfig.copy(defaultRequestConfig)
+                .setSocketTimeout(config.getMaxConnectTimeout()) // Https超時
+                .setConnectTimeout(config.getMaxConnectTimeout()) // 連線超時
+                .setConnectionRequestTimeout(config.getMaxSoTimeout()); // 請求超時
+    }
+    
+    /**
+     * 取得Http request配置建立器
+     * @return
+     */
+    public Builder getBaseRequestBuilder(String key) {
+        var defaultConfig = requestConfigs.getOrDefault(key, defaultRequestConfig);
+        return RequestConfig.copy(defaultConfig)
                 .setSocketTimeout(config.getMaxConnectTimeout()) // Https超時
                 .setConnectTimeout(config.getMaxConnectTimeout()) // 連線超時
                 .setConnectionRequestTimeout(config.getMaxSoTimeout()); // 請求超時

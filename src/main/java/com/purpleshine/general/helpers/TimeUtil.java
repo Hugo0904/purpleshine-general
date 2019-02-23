@@ -4,10 +4,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -15,6 +17,48 @@ import java.util.Locale;
 import java.util.Objects;
 
 public final class TimeUtil {
+    
+    static public Instant toInstant(final String time, final DateTimeFormatter formatter, final ZoneId zone) {
+        return LocalDateTime.parse(time, formatter).atZone(zone).toInstant();
+    }
+    
+    static public LocalDateTime toLocalDateTime(final long timestamp) {
+        return Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    
+    /**
+     * Timestamp to LocalDateTime
+     * 
+     * @param timestamp
+     * @param zone
+     * @return
+     */
+    static public LocalDateTime toLocalDateTime(final long timestamp, final ZoneId zone) {
+        return Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDateTime();
+    }
+    
+    /**
+     * 取得當前的timestamp
+     * 
+     * @return
+     */
+    static public long getCurrentTimestamp() {
+        final LocalDateTime ldt = LocalDateTime.now();
+        final ZonedDateTime zdt = ldt.atZone(ZoneId.systemDefault());
+        return zdt.toInstant().toEpochMilli();
+    }
+    
+    /**
+     * 取得當前的timestamp
+     * 
+     * @param zone 時區
+     * @return
+     */
+    static public long getCurrentTimestamp(final ZoneId zone) {
+        final LocalDateTime ldt = LocalDateTime.now();
+        final ZonedDateTime zdt = ldt.atZone(zone);
+        return zdt.toInstant().toEpochMilli();
+    }
     
     /**
      * 將字串時間轉成long
@@ -26,8 +70,8 @@ public final class TimeUtil {
      * @return 轉換後long
      * @throws ParseException 
      */
-    static public long getTimeCurrentTimeMillis(String time, String timesplite, Locale locale) throws ParseException {
-            return new SimpleDateFormat(timesplite, locale).parse(time).getTime();
+    static public Date convertTimestamp(final String time, final String timesplite, final Locale locale) throws ParseException {
+            return new SimpleDateFormat(timesplite, locale).parse(time);
     }
     
     /**
@@ -43,7 +87,7 @@ public final class TimeUtil {
      * @param pattern - 指定格時 ex yyyy/MM/dd xx:xx:xx
      * @return 日期字串
      */
-    static public String getNowTime(String pattern) {
+    static public String getNowTime(final String pattern) {
         final LocalDateTime now = LocalDateTime.now();
         return DateTimeFormatter.ofPattern(Objects.requireNonNull(pattern)).format(now);
     }
@@ -54,7 +98,7 @@ public final class TimeUtil {
      * @param amountToAdd
      * @return
      */
-    static public String plusTime(String pattern, long amountToAdd) {
+    static public String plusTime(final String pattern, final long amountToAdd) {
         return plusTime(pattern,ZoneId.systemDefault(), amountToAdd);
     }
     
@@ -64,7 +108,7 @@ public final class TimeUtil {
      * @param amountToAdd
      * @return
      */
-    static public String plusTime(String pattern, ZoneId zone, long amountToAdd) {
+    static public String plusTime(final String pattern, final ZoneId zone, final long amountToAdd) {
         LocalDateTime now = LocalDateTime.now(zone).plus(amountToAdd, ChronoUnit.MILLIS);
         return pattern == null ? now.toString() : DateTimeFormatter.ofPattern(pattern).format(now);
     }
@@ -100,30 +144,60 @@ public final class TimeUtil {
         return LocalDateTime.now(Clock.system(ZoneId.of(zoneId))).getHour() >= hour;
     }
     
+    /**
+     * 
+     * @param date
+     * @return
+     */
     static public LocalDateTime atStartOfDay(LocalDate date) {
         return date.atTime(LocalTime.MIN);
     }
     
+    /**
+     * 
+     * @param date
+     * @return
+     */
     static public LocalDateTime atEndOfDay(LocalDate date) {
         return date.atTime(LocalTime.MAX);
     }
     
+    /**
+     * 
+     * @param date
+     * @return
+     */
     static public Date atStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         LocalDateTime startOfDay = localDateTime.with(LocalTime.MIN);
         return localDateTimeToDate(startOfDay);
     }
 
+    /**
+     * 
+     * @param date
+     * @return
+     */
     static public Date atEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
         return localDateTimeToDate(endOfDay);
     }
 
+    /**
+     * 
+     * @param date
+     * @return
+     */
     static private LocalDateTime dateToLocalDateTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
+    /**
+     * 
+     * @param localDateTime
+     * @return
+     */
     static private Date localDateTimeToDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
