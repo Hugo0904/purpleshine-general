@@ -211,7 +211,7 @@ public class RedisUtil implements RedisClient, Switchable {
         String cursor = ScanParams.SCAN_POINTER_START;
         do {
             final ScanResult<String> op = scan(cursor, match, 1000);
-            cursor = op.getStringCursor();
+            cursor = op.getCursor();
             keys.addAll(op.getResult());
         } while (!cursor.equals(ScanParams.SCAN_POINTER_START));
         return keys;

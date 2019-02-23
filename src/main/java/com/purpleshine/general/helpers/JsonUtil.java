@@ -12,9 +12,9 @@ import org.json.JSONObject;
 import org.json.XML;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,7 +112,18 @@ public final class JsonUtil {
      * @throws JsonProcessingException 
      */
     static public <T> T convertNodeToObject(final JsonNode node, final Class<T> _class) throws JsonProcessingException {
-        return objectMapper.treeToValue(node, _class);
+        return objectMapper.<T>treeToValue(node, _class);
+    }
+    
+    /**
+     * 將資料自動轉成 T
+     * @param data
+     * @param _class
+     * @return
+     * @throws IOException 
+     */
+    static public <T> T convertNodeToObject(final JsonNode node, final TypeReference<? extends T> typeReference) throws IOException {
+        return objectMapper.<T>readValue(objectMapper.treeAsTokens(node), typeReference);
     }
     
     /**
@@ -298,6 +309,10 @@ public final class JsonUtil {
 
         private int compValue(JsonNode o1, JsonNode o2) {
 
+            if (o1 == o2 || o1.isNull() && o2.isNull()) {
+                return 0;
+            }
+            
             if (o1.isNull()) {
                 return -1;
             }
@@ -305,11 +320,15 @@ public final class JsonUtil {
             if (o2.isNull()) {
                 return 1;
             }
-
+            
             if (o1.isNumber() && o2.isNumber()) {
                 return o1.bigIntegerValue().compareTo(o2.bigIntegerValue());
             }
 
+            if (o1.isBoolean() && o2.isBoolean()) {
+                return Boolean.compare(o1.asBoolean(), o2.asBoolean());
+            }
+            
             return o1.asText().compareTo(o2.asText());
         }
 
