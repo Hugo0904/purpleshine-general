@@ -61,7 +61,7 @@ public final class IntervalControl {
 	 * @param millis
 	 * @return
 	 */
-	public boolean iMeetInterval(final Object key, final long millis) {
+	public boolean isMeetInterval(final Object key, final long millis) {
 		final Instant old = collector.get(key);
 		if (Objects.isNull(old)) {
 			return true;
@@ -90,7 +90,7 @@ public final class IntervalControl {
 	 * @return
 	 */
 	public boolean checkMeetAndResetInterval(final Object key, final long millis) {
-		final boolean isMeet = iMeetInterval(key, millis);
+		final boolean isMeet = isMeetInterval(key, millis);
 		if (isMeet) {
 			resetInterval(key);
 		}
