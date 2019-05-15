@@ -27,6 +27,7 @@
                     <release>12</release> <!-- java版本 --> 
                     <!-- <source>1.8</source> java版本 -->
                     <!-- <target>1.8</target> java子版本 -->
+                    <!-- <compilerArgs>-enable-preview</compilerArgs> -->
                     <encoding>UTF-8</encoding>
                 </configuration>
                 <dependencies>
