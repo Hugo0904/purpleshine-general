@@ -8,11 +8,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
 import com.purpleshine.general.core.interfaces.RedisClient;
 import com.purpleshine.general.core.interfaces.Singleton;
 import com.purpleshine.general.core.interfaces.Switchable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Protocol;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.Tuple;
@@ -41,7 +44,26 @@ public class RedisUtil implements RedisClient, Switchable {
     @Override
     public boolean start(Object... options) {
         if (start.compareAndSet(false, true)) {
-            pool = new JedisPool((String) options[0], (int) options[1]);
+            switch (options.length) {
+            case 3:
+                pool = new JedisPool(new GenericObjectPoolConfig(), (String) options[0], (int) options[1], (int) options[2], null, Protocol.DEFAULT_DATABASE);
+                
+                break;
+                
+            case 4:
+                pool = new JedisPool(new GenericObjectPoolConfig(), (String) options[0], (int) options[1], (int) options[2], (String) options[3], Protocol.DEFAULT_DATABASE);
+                break;
+                
+            case 5:
+                pool = new JedisPool(new GenericObjectPoolConfig(), (String) options[0], (int) options[1], (int) options[2], (String) options[3], (int) options[4]);
+                break;
+
+            default:
+                pool = new JedisPool(new GenericObjectPoolConfig(), (String) options[0], (int) options[1], Protocol.DEFAULT_TIMEOUT, null, Protocol.DEFAULT_DATABASE);
+                break;
+            }
+            
+            System.out.println(pool.getResource().getDB());
         }
         return isRunning();
     }

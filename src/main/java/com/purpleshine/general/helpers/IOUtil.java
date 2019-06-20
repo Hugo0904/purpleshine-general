@@ -39,7 +39,14 @@ public final class IOUtil {
     static public <T> T createInstance(final String className, Object ...params) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException { 
         final Class<T> clazz = (Class<T>) Class.forName(className);
         final Class<?>[] types = Arrays.asList(params).stream()
-                .map(i -> i.getClass())
+                .map(i -> {
+                    var c =  i.getClass();
+                    try {
+                        return c.getField("TYPE").get(null);
+                    } catch (Exception e) {
+                        return c;
+                    }
+                })
                 .collect(Collectors.toList())
                 .toArray(new Class<?>[params.length]);
         
