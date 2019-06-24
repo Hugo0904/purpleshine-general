@@ -47,7 +47,6 @@ public class RedisUtil implements RedisClient, Switchable {
             switch (options.length) {
             case 3:
                 pool = new JedisPool(new GenericObjectPoolConfig(), (String) options[0], (int) options[1], (int) options[2], null, Protocol.DEFAULT_DATABASE);
-                
                 break;
                 
             case 4:
