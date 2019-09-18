@@ -99,7 +99,7 @@ public final class TimeUtil {
      * @return
      */
     static public String plusTime(final String pattern, final long amountToAdd) {
-        return plusTime(pattern,ZoneId.systemDefault(), amountToAdd);
+        return plusTime(pattern, ZoneId.systemDefault(), amountToAdd);
     }
     
     /**
