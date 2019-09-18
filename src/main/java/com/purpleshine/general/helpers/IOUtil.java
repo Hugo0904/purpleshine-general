@@ -155,7 +155,6 @@ public final class IOUtil {
 				if (curc != null)
 					curc = curc.getSuperclass();
 				else {
-					System.out.println(instance.getClass().getName() + " = " + methodName + " = " + typeClazz);
 					return false;
 				}
 			}

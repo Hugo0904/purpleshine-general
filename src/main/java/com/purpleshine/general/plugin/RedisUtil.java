@@ -61,8 +61,6 @@ public class RedisUtil implements RedisClient, Switchable {
                 pool = new JedisPool(new GenericObjectPoolConfig(), (String) options[0], (int) options[1], Protocol.DEFAULT_TIMEOUT, null, Protocol.DEFAULT_DATABASE);
                 break;
             }
-            
-            System.out.println(pool.getResource().getDB());
         }
         return isRunning();
     }
