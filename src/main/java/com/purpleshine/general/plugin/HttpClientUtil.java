@@ -133,6 +133,17 @@ public final class HttpClientUtil {
         ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     };
     
+ // 取得資料用 JSON
+    static public final Header[] DATA_JSON_HEADERS2 = {
+        new BasicHeader("Accept", "text/plain, */*; q=0.01")
+        ,new BasicHeader("Accept-Encoding", "gzip, deflate, sdch")
+        ,new BasicHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4")
+        ,new BasicHeader("Connection", "keep-alive")
+        ,new BasicHeader("Content-Type", "application/json;")
+        ,new BasicHeader("X-Requested-With", "XMLHttpRequest")
+        ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
+    };
+    
     private Map<String, RequestConfig> requestConfigs = new HashMap<>();
     
     private final HttpClientConfig config;
