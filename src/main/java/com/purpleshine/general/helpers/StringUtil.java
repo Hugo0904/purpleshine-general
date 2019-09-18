@@ -44,6 +44,15 @@ public class StringUtil {
     }
     
     /**
+     * 判斷字串是否不為空值
+     * @param str
+     * @return
+     */
+    public static boolean isNotEmpty(String str) {
+        return ! isEmpty(str);
+    }
+    
+    /**
      *  String型態數字增加 
      * @param num - 字串數字
      * @param v - 增加多少
