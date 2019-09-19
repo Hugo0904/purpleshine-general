@@ -133,7 +133,7 @@ public final class HttpClientUtil {
         ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     };
     
- // 取得資料用 JSON
+    // 取得資料用 JSON
     static public final Header[] DATA_JSON_HEADERS2 = {
         new BasicHeader("Accept", "text/plain, */*; q=0.01")
         ,new BasicHeader("Accept-Encoding", "gzip, deflate, sdch")

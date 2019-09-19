@@ -28,4 +28,64 @@ public class NumberUtil {
     static public boolean isNumericAndValue(String num, int min) {
         return isFloatNumeric(num) && Integer.parseInt(num) > min;
     }
+    
+    /**
+     * 數字不為0
+     * 
+     * @param num
+     * @return
+     */
+    static public boolean isZero(Object num) {
+        return ((Number) num).longValue() == 0;
+    }
+    
+    /**
+     * 數字不為0
+     * 
+     * @param num
+     * @return
+     */
+    static public boolean isNotZero(Object num) {
+        return ((Number) num).longValue() != 0;
+    }
+    
+    /**
+     * 數字大於等於0
+     * 
+     * @param num
+     * @return
+     */
+    static public boolean isMaxZero(Object num) {
+        return ((Number) num).longValue() >= 0;
+    }
+    
+    /**
+     * 數字大於0
+     * 
+     * @param num
+     * @return
+     */
+    static public boolean isMaxThanZero(Object num) {
+        return ((Number) num).longValue() > 0;
+    }
+    
+    /**
+     * 數字小於等於0
+     * 
+     * @param num
+     * @return
+     */
+    static public boolean isMinZero(Object num) {
+        return ((Number) num).longValue() <= 0;
+    }
+    
+    /**
+     * 數字小於0
+     * 
+     * @param num
+     * @return
+     */
+    static public boolean isMinThanZero(Object num) {
+        return ((Number) num).longValue() < 0;
+    }
 }
