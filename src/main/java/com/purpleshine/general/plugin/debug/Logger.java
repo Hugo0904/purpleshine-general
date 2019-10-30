@@ -212,7 +212,7 @@ public final class Logger extends PublishScheduler<Void> implements Switchable {
         try {
             if (Objects.nonNull(args) && args.length > 0)
                 message = String.format(message, args);
-            
+           
 //            message = String.format("[%d]\n%s", Thread.currentThread().getId(), message);
             
             if (Objects.nonNull(config)) {

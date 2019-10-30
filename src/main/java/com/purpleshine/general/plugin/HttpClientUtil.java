@@ -103,7 +103,7 @@ public final class HttpClientUtil {
     // 一般 GET
     static public final Header[] DATA_GET_HEADERS = {
         new BasicHeader("Accept", "text/plain, */*; q=0.01")
-        ,new BasicHeader("Accept-Encoding", "gzip, deflate")
+        ,new BasicHeader("Accept-Encoding", "gzip, deflate, sdch")
         ,new BasicHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4")
         ,new BasicHeader("Connection", "keep-alive")
         ,new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
@@ -114,7 +114,7 @@ public final class HttpClientUtil {
     // 一般 POST
     static public final Header[] DATA_POST_HEADERS = {
         new BasicHeader("Accept", "text/plain, */*; q=0.01")
-        ,new BasicHeader("Accept-Encoding", "gzip, deflate")
+        ,new BasicHeader("Accept-Encoding", "gzip, deflate, sdch")
         ,new BasicHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4")
         ,new BasicHeader("Connection", "keep-alive")
         ,new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
