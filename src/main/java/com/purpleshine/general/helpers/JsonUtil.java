@@ -123,7 +123,7 @@ public final class JsonUtil {
      * @throws IOException 
      */
     static public <T> T convertNodeToObject(final JsonNode node, final TypeReference<? extends T> typeReference) throws IOException {
-        return objectMapper.<T>readValue(objectMapper.treeAsTokens(node), typeReference);
+        return objectMapper.readValue(objectMapper.treeAsTokens(node), typeReference);
     }
     
     /**
