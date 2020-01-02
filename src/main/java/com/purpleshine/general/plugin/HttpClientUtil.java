@@ -314,10 +314,11 @@ public final class HttpClientUtil {
         
         // Create global request configuration
         defaultRequestConfig = RequestConfig.custom()
+            .setCookieSpec(CookieSpecs.STANDARD)
+//          .setCookieSpec(CookieSpecs.DEFAULT)
             .setSocketTimeout(config.getMaxConnectTimeout()) // Https超時
             .setConnectTimeout(config.getMaxConnectTimeout()) // 連線超時
             .setConnectionRequestTimeout(config.getMaxSoTimeout()) // 請求超時
-            .setCookieSpec(CookieSpecs.DEFAULT)
             .setExpectContinueEnabled(true)
             .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST))
             .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC))
