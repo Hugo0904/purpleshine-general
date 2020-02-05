@@ -114,6 +114,27 @@ public final class TimeUtil {
     }
     
     /**
+     * 取得當前時間日期重新加減後的時間
+     * @param pattern
+     * @param amountToAdd
+     * @return
+     */
+    static public String plusZoneTime(final String pattern, final long amountToAdd) {
+        return plusZoneTime(pattern, ZoneId.systemDefault(), amountToAdd);
+    }
+    
+    /**
+     * 取得當前時間日期重新加減後的時間(加入時區轉換)
+     * @param pattern
+     * @param amountToAdd
+     * @return
+     */
+    static public String plusZoneTime(final String pattern, final ZoneId zone, final long amountToAdd) {
+        final ZonedDateTime now = ZonedDateTime.now(zone).plus(amountToAdd, ChronoUnit.MILLIS);
+        return pattern == null ? now.toString() : DateTimeFormatter.ofPattern(pattern).format(now);
+    }
+    
+    /**
      * 取得今日已消逝的時間
      * @param zoneId
      * @return
