@@ -76,4 +76,34 @@ public class StringUtil {
         }
         return false;
     }
+    
+    /**
+     * 亂數隨機
+     * 
+     * @param n
+     * @return
+     */
+    static public String random(int n) 
+    { 
+  
+        // chose a Character random from this String 
+        final String alphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                    + "0123456789"
+                                    + "abcdefghijklmnopqrstuvxyz"; 
+  
+        // create StringBuffer size of AlphaNumericString 
+        final StringBuilder sb = new StringBuilder(n); 
+  
+        for (int i = 0; i < n; i++) { 
+  
+            // generate a random number between 
+            // 0 to AlphaNumericString variable length 
+            int index = (int)(alphaNumericString.length() * Math.random()); 
+  
+            // add Character one by one in end of sb 
+            sb.append(alphaNumericString .charAt(index)); 
+        } 
+  
+        return sb.toString(); 
+    } 
 }
