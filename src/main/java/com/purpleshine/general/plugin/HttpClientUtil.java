@@ -98,6 +98,8 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
+import com.purpleshine.general.helpers.QueryUtil;
+
 public final class HttpClientUtil {
     
     // 一般 GET
@@ -434,7 +436,7 @@ public final class HttpClientUtil {
     public ResponseData get(String url, Map<String, String> params, Header[] headers) throws IOException, URISyntaxException {
         final HttpGet httpGet = new HttpGet(url);
         // 帶入參數
-        httpGet.setURI(buildGetQuery(httpGet.getURI(), params));
+        httpGet.setURI(QueryUtil.buildGetQuery(httpGet.getURI(), params));
         // Request configuration can be overridden at the request level.
         // They will take precedence over the one set at the client level.
         return execute(httpGet, headers);
@@ -452,7 +454,41 @@ public final class HttpClientUtil {
      */
     public ResponseData get(String url, Map<String, String> params, Header[] headers, Builder builder) throws URISyntaxException, IOException {
         final HttpGet httpGet = new HttpGet(url);
-        httpGet.setURI(buildGetQuery(httpGet.getURI(), params));
+        httpGet.setURI(QueryUtil.buildGetQuery(httpGet.getURI(), params));
+        return execute(httpGet, headers, builder);
+    }
+    
+    /**
+     * Get
+     * @param url
+     * @param params
+     * @param headers
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public ResponseData getOfLowerCaseEncode(String url, Map<String, String> params, Header[] headers) throws IOException, URISyntaxException {
+        final HttpGet httpGet = new HttpGet(url);
+        // 帶入參數
+        httpGet.setURI(new URI(QueryUtil.encodeLowerCase(QueryUtil.buildGetQuery(httpGet.getURI(), params).toString())));
+        // Request configuration can be overridden at the request level.
+        // They will take precedence over the one set at the client level.
+        return execute(httpGet, headers);
+    }
+    
+    /**
+     * Get
+     * @param url
+     * @param params
+     * @param headers
+     * @param builder
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public ResponseData getOfLowerCaseEncode(String url, Map<String, String> params, Header[] headers, Builder builder) throws URISyntaxException, IOException {
+        final HttpGet httpGet = new HttpGet(url);
+        httpGet.setURI(new URI(QueryUtil.encodeLowerCase(QueryUtil.buildGetQuery(httpGet.getURI(), params).toString())));
         return execute(httpGet, headers, builder);
     }
     
@@ -685,47 +721,6 @@ public final class HttpClientUtil {
                 .setConnectionRequestTimeout(config.getMaxSoTimeout()); // 請求超時
     }
     
-    /**
-     * 生成Get Query
-     * @param uri
-     * @param params
-     * @return
-     * @throws URISyntaxException
-     */
-    static public URI buildGetQuery(final URI uri, final Map<String, String> params) throws URISyntaxException {
-        if (params == null) return uri;
-        final URIBuilder builder = new URIBuilder(uri);
-        for (Entry<String, String> param : params.entrySet()) {
-         builder.addParameter(param.getKey(), param.getValue());
-        }
-        return builder.build();
-    }
-    
-    /**
-     * 生成Get Query
-     * @param params
-     * @return
-     */
-    static public String buildGetQuery(final Map<String, String> params) {
-        final URIBuilder builder = new URIBuilder();
-        for (Entry<String, String> param : params.entrySet()) {
-             builder.addParameter(param.getKey(), param.getValue());
-        }
-        return builder.toString();
-    }
-    
-    /**
-     * 生成Query(無?)
-     * @param params
-     * @return
-     */
-    static public String buildQuery(final Map<String, String> params) {
-        return params.entrySet().stream()
-                .map(param -> param.getKey() + "=" + param.getValue())
-                .collect(Collectors.joining("&"));
-    }
-    
-
     /**
      * HttpClient建立設定配置
      * @author yueh

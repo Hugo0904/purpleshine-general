@@ -9,4 +9,3 @@ public interface ArgsAction {
 		void invoke();
 	}
 }
-
