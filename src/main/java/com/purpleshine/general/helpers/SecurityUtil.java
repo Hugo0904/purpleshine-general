@@ -19,8 +19,18 @@ public class SecurityUtil {
     static public String md5(final String content) {
         return DigestUtils.md5Hex(content);
     }
+    
+    static public String encryptPKCS5PaddingAES(final String data, final String key, final String iv) throws GeneralSecurityException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        byte[] raw = key.getBytes("UTF-8");
+        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        IvParameterSpec iv1 = new IvParameterSpec(iv.getBytes("UTF-8"));
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv1);
+        byte[] encrypted = cipher.doFinal(data.getBytes("UTF-8"));
+        return Base64.encodeBase64String(encrypted);
+    }
 
-    static public String encryptAES(final String data, final String key, final String iv) throws GeneralSecurityException, UnsupportedEncodingException {
+    static public String encryptNoPaddingAES(final String data, final String key, final String iv) throws GeneralSecurityException, UnsupportedEncodingException {
         final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
         final int blockSize = cipher.getBlockSize();
         final byte[] dataBytes = data.getBytes("UTF-8");
