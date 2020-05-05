@@ -49,6 +49,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -683,7 +684,7 @@ public final class HttpClientUtil {
                 final HttpEntity entity = response.getEntity();
                 try {
                     final String responseText = EntityUtils.toString(entity, Consts.UTF_8);
-                    return new ResponseData(httpType.getURI().toString(), context, response.getStatusLine(), responseText, Duration.between(start, Instant.now()));
+                    return new ResponseData(httpType, httpType.getURI().toString(), context, response.getStatusLine(), responseText, Duration.between(start, Instant.now()));
                 } finally {
                     EntityUtils.consume(entity);
                 }
@@ -821,6 +822,7 @@ public final class HttpClientUtil {
     
     static public final class ResponseData {
         private final String requestUri;
+        private final HttpRequestBase httpRequestBase;
         private final StatusLine statusLine;
         private final HttpRequest httpRequest;
         private final RouteInfo httpRoute;
@@ -835,6 +837,7 @@ public final class HttpClientUtil {
         public ResponseData(String response) {
             this.httpResponse = response;
             this.requestUri = null;
+            this.httpRequestBase = null;
             this.httpRequest = null;
             this.httpRoute = null;
             this.targetAuthState = null;
@@ -846,7 +849,8 @@ public final class HttpClientUtil {
             this.requestTime = null;
         }
         
-        public ResponseData(String requestUri, HttpClientContext context, StatusLine statusLine, String response, Duration requestTime) {
+        public ResponseData(HttpRequestBase httpRequestBase, String requestUri, HttpClientContext context, StatusLine statusLine, String response, Duration requestTime) {
+            this.httpRequestBase = httpRequestBase;
             this.requestUri = requestUri;
             this.httpRequest = context.getRequest();
             this.httpRoute = context.getHttpRoute();
@@ -942,6 +946,20 @@ public final class HttpClientUtil {
          */
         public Duration getRequestTime() {
             return requestTime;
+        }
+
+        public HttpRequestBase getHttpRequestBase() {
+            return httpRequestBase;
+        }
+        
+        public String toQueryJsonString() throws ParseException, IOException {
+            if (this.httpRequestBase instanceof HttpGet) {
+                return ((HttpGet) this.httpRequestBase).getURI().getQuery();
+            } else if (this.httpRequestBase instanceof HttpPost || this.httpRequestBase instanceof HttpPut) {
+                return EntityUtils.toString(((HttpEntityEnclosingRequestBase) this.httpRequestBase).getEntity(), Consts.UTF_8);
+            }
+            
+            return null;
         }
     }
 }
