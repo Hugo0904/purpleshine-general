@@ -2,7 +2,15 @@ package com.purpleshine.general.plugin.safe;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
@@ -37,10 +45,10 @@ public final class TripleDESede {
 	 * @throws GeneralSecurityException
 	 * @throws UnsupportedEncodingException
 	 */
-	static public String decrypt(String base64edData, String base64edKey, String base64edIv) throws GeneralSecurityException, UnsupportedEncodingException {
+	static public String decryptCBCPKCS5Padding(String base64edData, String base64edKey, String base64edIv) throws GeneralSecurityException, UnsupportedEncodingException {
 	    final byte[] keyByte = Base64.decodeBase64(base64edKey);
 		final var iv = base64edIv == null ? NULL_IV : Base64.decodeBase64(base64edIv);
-		return StringUtils.newStringUtf8(decrypt(Base64.decodeBase64(base64edData), keyByte, iv));
+		return StringUtils.newStringUtf8(decryptCBCPKCS5Padding(Base64.decodeBase64(base64edData), keyByte, iv));
 	}
 
 	/**
@@ -57,10 +65,10 @@ public final class TripleDESede {
 	 * @throws GeneralSecurityException
 	 * @throws UnsupportedEncodingException
 	 */
-	static public String encrypt(String data, String base64edKey, String base64edIv) throws GeneralSecurityException, UnsupportedEncodingException {
+	static public String encryptCBCPKCS5Padding(String data, String base64edKey, String base64edIv) throws GeneralSecurityException, UnsupportedEncodingException {
 		final byte[] keyByte = Base64.decodeBase64(base64edKey);
 		final var iv = base64edIv == null ? NULL_IV : Base64.decodeBase64(base64edIv);
-		return Base64.encodeBase64String(encrypt(StringUtils.getBytesUtf8(data), keyByte, iv));
+		return Base64.encodeBase64String(encryptCBCPKCS5Padding(StringUtils.getBytesUtf8(data), keyByte, iv));
 	}
 
 	/**
@@ -75,11 +83,11 @@ public final class TripleDESede {
      * @return
      * @throws GeneralSecurityException
      */
-    static public byte[] decrypt(byte[] data, byte[] key, byte[] iv) throws GeneralSecurityException {
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
-        SecretKey sec = keyFactory.generateSecret(new DESedeKeySpec(key));
-        Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
-        IvParameterSpec IvParameters = new IvParameterSpec(iv);
+    static public byte[] decryptCBCPKCS5Padding(byte[] data, byte[] key, byte[] iv) throws GeneralSecurityException {
+        final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
+        final SecretKey sec = keyFactory.generateSecret(new DESedeKeySpec(key));
+        final Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+        final IvParameterSpec IvParameters = new IvParameterSpec(iv);
         cipher.init(Cipher.DECRYPT_MODE, sec, IvParameters);
         return cipher.doFinal(data);
     }
@@ -96,34 +104,54 @@ public final class TripleDESede {
      * @return
      * @throws GeneralSecurityException
      */
-    static public byte[] encrypt(byte[] data, byte[] key, byte[] iv) throws GeneralSecurityException {
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
-        SecretKey sec = keyFactory.generateSecret(new DESedeKeySpec(key));
-        Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
-        IvParameterSpec IvParameters = new IvParameterSpec(iv);
+    static public byte[] encryptCBCPKCS5Padding(byte[] data, byte[] key, byte[] iv) throws GeneralSecurityException {
+        final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
+        final SecretKey sec = keyFactory.generateSecret(new DESedeKeySpec(key));
+        final Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+        final IvParameterSpec IvParameters = new IvParameterSpec(iv);
         cipher.init(Cipher.ENCRYPT_MODE, sec, IvParameters);
         return cipher.doFinal(data);
     }
     
     /**
-     * 解密<br/>
      * 
-     * @param data
-     *            被解码的数据(注意编码转换)
-     * @param key
-     *            key
-     * @param iv
-     *            向量(必须为8byte)
+     * @param dataBytes
+     * @param keyBytes
+     * @param ivBytes
      * @return
-     * @throws GeneralSecurityException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidKeySpecException
+     * @throws InvalidAlgorithmParameterException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
      */
-	static public String encrypt(String input, String key) throws GeneralSecurityException {
-		byte[] crypted = null;
-		SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "DES");
-        Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
-        IvParameterSpec IvParameters = new IvParameterSpec(key.getBytes());
-        cipher.init(Cipher.ENCRYPT_MODE, skey, IvParameters);
-        crypted = cipher.doFinal(input.getBytes());
-        return new String(Base64.encodeBase64(crypted));
-	}
+    static public byte[] encryptCBCNoPadding(byte[] dataBytes, byte[] keyBytes, byte[] ivBytes) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidKeySpecException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+        final Cipher cipher = Cipher.getInstance("DESede/CBC/NoPadding");
+        final int blockSize = cipher.getBlockSize();
+
+        int plaintextLength = dataBytes.length;
+        if (plaintextLength % blockSize != 0) {
+            plaintextLength = plaintextLength + (blockSize - (plaintextLength % blockSize));
+        }
+
+        final byte[] plaintext = new byte[plaintextLength];
+        System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
+        
+        final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
+        final SecretKey sec = keyFactory.generateSecret(new DESedeKeySpec(keyBytes));
+        final IvParameterSpec ivspec = new IvParameterSpec(ivBytes);
+
+        cipher.init(Cipher.ENCRYPT_MODE, sec, ivspec);
+        return cipher.doFinal(plaintext);
+     }
+    
+    public static byte[] desEncrypt(byte[] dataBytes, byte[] keyBytes, byte[] ivBytes) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException {
+        Cipher cipher = Cipher.getInstance("DESede/CBC/NoPadding");
+        SecretKeySpec keyspec = new SecretKeySpec(keyBytes, "DESede");
+        IvParameterSpec ivspec = new IvParameterSpec(ivBytes);
+        cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+        return cipher.doFinal(dataBytes);
+    }
 }

@@ -956,7 +956,9 @@ public final class HttpClientUtil {
             if (this.httpRequestBase instanceof HttpGet) {
                 return ((HttpGet) this.httpRequestBase).getURI().getQuery();
             } else if (this.httpRequestBase instanceof HttpPost || this.httpRequestBase instanceof HttpPut) {
-                return EntityUtils.toString(((HttpEntityEnclosingRequestBase) this.httpRequestBase).getEntity(), Consts.UTF_8);
+                if (Objects.nonNull(((HttpEntityEnclosingRequestBase) this.httpRequestBase).getEntity())) {
+                    return EntityUtils.toString(((HttpEntityEnclosingRequestBase) this.httpRequestBase).getEntity(), Consts.UTF_8);    
+                }
             }
             
             return null;
