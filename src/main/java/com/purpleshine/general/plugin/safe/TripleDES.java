@@ -19,7 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.codec.binary.StringUtils;   
 
 /**
  * 3DES加解密工具类
@@ -31,7 +31,7 @@ public final class TripleDES {
     }
 
     /**
-     * 解密<br/>
+     * Decrypt DES/CBC/PKCS5Padding
      * 
      * @param base64edData
      *            经过base64编码的数据
@@ -41,21 +41,28 @@ public final class TripleDES {
      * @throws GeneralSecurityException
      * @throws UnsupportedEncodingException
      */
-    static public String decrypt(String base64edData, String base64edKey)
+    static public String decryptCBCPKCS5Padding(String base64edData, String base64edKey)
             throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException {
         return StringUtils.newStringUtf8(decrypt(base64edData.getBytes(Charsets.UTF_8), base64edKey.getBytes(Charsets.UTF_8)));
     }
 
-    static public String encryptCBC(String input, String key) throws GeneralSecurityException {
-        SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "DES");
-        Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
-        IvParameterSpec IvParameters = new IvParameterSpec(key.getBytes());
+    /**
+     * Encrypt DES/CBC/PKCS5Padding
+     * 
+     * @param input
+     * @param key
+     * @return
+     * @throws GeneralSecurityException
+     */
+    static public byte[] encryptCBCPKCS5Padding(byte[] input, byte[] key) throws GeneralSecurityException {
+        final SecretKeySpec skey = new SecretKeySpec(key, "DES");
+        final Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
+        final IvParameterSpec IvParameters = new IvParameterSpec(key);
         cipher.init(Cipher.ENCRYPT_MODE, skey, IvParameters);
-        byte[] crypted = cipher.doFinal(input.getBytes());
-        return new String(Base64.encodeBase64(crypted));
+        return cipher.doFinal(input);
     }
-
+    
     /**
      * 加密<br/>
      * 
@@ -85,13 +92,13 @@ public final class TripleDES {
      */
     static public byte[] encrypt(byte[] data, byte[] key) throws InvalidKeyException, NoSuchAlgorithmException,
             InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-        SecureRandom random = new SecureRandom();
-        DESKeySpec desKey = new DESKeySpec(key);
+        final SecureRandom random = new SecureRandom();
+        final DESKeySpec desKey = new DESKeySpec(key);
         // 创建一个密匙工厂，然后用它把DESKeySpec转换成
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey securekey = keyFactory.generateSecret(desKey);
+        final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+        final SecretKey securekey = keyFactory.generateSecret(desKey);
         // Cipher对象实际完成加密操作
-        Cipher cipher = Cipher.getInstance("DES");
+        final Cipher cipher = Cipher.getInstance("DES");
         // 用密匙初始化Cipher对象
         cipher.init(Cipher.ENCRYPT_MODE, securekey, random);
         return cipher.doFinal(data);
@@ -113,15 +120,15 @@ public final class TripleDES {
     public static byte[] decrypt(byte[] data, byte[] key) throws InvalidKeyException, NoSuchAlgorithmException,
             InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         // DES算法要求有一个可信任的随机数源
-        SecureRandom random = new SecureRandom();
+        final SecureRandom random = new SecureRandom();
         // 创建一个DESKeySpec对象
-        DESKeySpec desKey = new DESKeySpec(key);
+        final DESKeySpec desKey = new DESKeySpec(key);
         // 创建一个密匙工厂
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+        final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
         // 将DESKeySpec对象转换成SecretKey对象
-        SecretKey securekey = keyFactory.generateSecret(desKey);
+        final SecretKey securekey = keyFactory.generateSecret(desKey);
         // Cipher对象实际完成解密操作
-        Cipher cipher = Cipher.getInstance("DES");
+        final Cipher cipher = Cipher.getInstance("DES");
         // 用密匙初始化Cipher对象
         cipher.init(Cipher.DECRYPT_MODE, securekey, random);
         // 真正开始解密操作
