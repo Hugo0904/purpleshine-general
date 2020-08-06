@@ -849,6 +849,21 @@ public final class HttpClientUtil {
             this.requestTime = null;
         }
         
+        public ResponseData(String requestUri, String response, Duration requestTime) {
+            this.httpRequestBase = null;
+            this.requestUri = requestUri;
+            this.httpRequest = null;
+            this.httpRoute = null;
+            this.targetAuthState = null;
+            this.proxyAuthState = null;
+            this.cookieOrigin = null;
+            this.cookieSpec = null;
+            this.usetToken = null;
+            this.statusLine = null;
+            this.httpResponse = response;
+            this.requestTime = requestTime;
+        }
+        
         public ResponseData(HttpRequestBase httpRequestBase, String requestUri, HttpClientContext context, StatusLine statusLine, String response, Duration requestTime) {
             this.httpRequestBase = httpRequestBase;
             this.requestUri = requestUri;
