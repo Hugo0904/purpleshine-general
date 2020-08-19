@@ -36,8 +36,10 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/httpcomponents/httpmime/4.5.7/httpmime-4.5.7.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/commons/commons-lang3/3.9/commons-lang3-3.9.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/jsoup/jsoup/1.11.3/jsoup-1.11.3.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/commons-net/commons-net/3.6/commons-net-3.6.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/redis/clients/jedis/3.0.1/jedis-3.0.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/commons/commons-pool2/2.4.3/commons-pool2-2.4.3.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/projectlombok/lombok/1.18.6/lombok-1.18.6.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/auth0/java-jwt/3.9.0/java-jwt-3.9.0.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>
