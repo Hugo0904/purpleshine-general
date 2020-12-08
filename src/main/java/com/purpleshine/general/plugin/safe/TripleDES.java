@@ -2,6 +2,7 @@ package com.purpleshine.general.plugin.safe;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -19,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;   
+import org.apache.commons.codec.binary.StringUtils;
 
 /**
  * 3DES加解密工具类
@@ -31,38 +32,44 @@ public final class TripleDES {
     }
 
     /**
-     * Decrypt DES/CBC/PKCS5Padding
-     * 
-     * @param base64edData
-     *            经过base64编码的数据
-     * @param base64edKey
-     *            经过base64编码的数据
-     * @return 解密后的数据(UTF-8编码)
-     * @throws GeneralSecurityException
-     * @throws UnsupportedEncodingException
-     */
-    static public String decryptCBCPKCS5Padding(String base64edData, String base64edKey)
-            throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
-            IllegalBlockSizeException, BadPaddingException {
-        return StringUtils.newStringUtf8(decrypt(base64edData.getBytes(Charsets.UTF_8), base64edKey.getBytes(Charsets.UTF_8)));
-    }
-
-    /**
      * Encrypt DES/CBC/PKCS5Padding
      * 
      * @param input
      * @param key
+     * @param iv
      * @return
      * @throws GeneralSecurityException
      */
-    static public byte[] encryptCBCPKCS5Padding(byte[] input, byte[] key) throws GeneralSecurityException {
-        final SecretKeySpec skey = new SecretKeySpec(key, "DES");
+    static public String encryptCBCPKCS5Padding(String input, String key, String iv) throws GeneralSecurityException {
+        final SecretKeySpec skey = new SecretKeySpec(key.getBytes(Charsets.UTF_8), "DES");
         final Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
-        final IvParameterSpec IvParameters = new IvParameterSpec(key);
+        final IvParameterSpec IvParameters = new IvParameterSpec(iv.getBytes(Charsets.UTF_8));
         cipher.init(Cipher.ENCRYPT_MODE, skey, IvParameters);
-        return cipher.doFinal(input);
+        return StringUtils.newStringUtf8(Base64.encodeBase64(cipher.doFinal(input.getBytes(Charsets.UTF_8))));
     }
-    
+
+    /**
+     * Decrypt DES/CBC/PKCS5Padding
+     * 
+     * @param input
+     * @param key
+     * @param iv
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException
+     */
+    public static String decryptCBCPKCS5Padding(String input, String key, String iv) throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        final SecretKeySpec skey = new SecretKeySpec(key.getBytes(Charsets.UTF_8), "DES");
+        final Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
+        final IvParameterSpec IvParameters = new IvParameterSpec(iv.getBytes(Charsets.UTF_8));
+        cipher.init(Cipher.DECRYPT_MODE, skey, IvParameters);
+        return StringUtils.newStringUtf8(cipher.doFinal(Base64.decodeBase64(input.getBytes(Charsets.UTF_8))));
+    }
+
     /**
      * 加密<br/>
      * 
@@ -78,6 +85,24 @@ public final class TripleDES {
     static public String encrypt(String data, String base64edKey) throws InvalidKeyException, NoSuchAlgorithmException,
             InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         return Base64.encodeBase64String(encrypt(data.getBytes(Charsets.UTF_8), base64edKey.getBytes(Charsets.UTF_8)));
+    }
+    
+    /**
+     * Decrypt DES/CBC/PKCS5Padding
+     * 
+     * @param base64edData
+     *            经过base64编码的数据
+     * @param base64edKey
+     *            经过base64编码的数据
+     * @return 解密后的数据(UTF-8编码)
+     * @throws GeneralSecurityException
+     * @throws UnsupportedEncodingException
+     */
+    static public String decrypt(String base64edData, String base64edKey)
+            throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
+            IllegalBlockSizeException, BadPaddingException {
+        return StringUtils
+                .newStringUtf8(decrypt(base64edData.getBytes(Charsets.UTF_8), base64edKey.getBytes(Charsets.UTF_8)));
     }
 
     /**
