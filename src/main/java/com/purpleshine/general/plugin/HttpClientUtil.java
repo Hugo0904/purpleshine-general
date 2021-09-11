@@ -99,6 +99,7 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
+import com.purpleshine.general.helpers.JsonUtil;
 import com.purpleshine.general.helpers.QueryUtil;
 
 public final class HttpClientUtil {
@@ -146,6 +147,18 @@ public final class HttpClientUtil {
         ,new BasicHeader("X-Requested-With", "XMLHttpRequest")
         ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     };
+    
+    // 取得資料用 JSON
+    static public final Header[] DATA_JSON_HEADERS3 = {
+        new BasicHeader("Accept", "application/json; charset=utf-8")
+        ,new BasicHeader("Accept-Encoding", "gzip, deflate, sdch")
+        ,new BasicHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4")
+        ,new BasicHeader("Connection", "keep-alive")
+        ,new BasicHeader("Content-Type", "application/json")
+        ,new BasicHeader("X-Requested-With", "XMLHttpRequest")
+        ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
+    };
+    
     
     private Map<String, RequestConfig> requestConfigs = new HashMap<>();
     
@@ -543,6 +556,19 @@ public final class HttpClientUtil {
     public ResponseData post(final String url, final Header[] headers) throws ParseException, IOException {
         final HttpPost httpPost = new HttpPost(url);
         return execute(httpPost, headers);
+    }
+    
+    /**
+     * Post Json字串
+     * @param url
+     * @param json
+     * @param headers
+     * @return
+     * @throws ParseException
+     * @throws IOException
+     */
+    public ResponseData postJson(final String url, final Object json, final Header[] headers) throws ParseException, IOException {
+        return postJson(url, JsonUtil.convertObjectToJson(json), headers);
     }
     
     /**
