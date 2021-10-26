@@ -255,9 +255,15 @@ public final class HttpClientUtil {
 
         // Create a registry of custom connection socket factories for supported
         // protocol schemes.
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                SSLContexts.createDefault(),
+                (config.useTls13 ? new String[] { "TLSv1.2", "TLSv1.3" } : new String[] { "TLSv1.2" }),
+                null,
+                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+        
         final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
             .register("http", PlainConnectionSocketFactory.INSTANCE)
-            .register("https", SSLConnectionSocketFactory.getSocketFactory())
+            .register("https", sslsf)
             .build();
 
         // Use custom DNS resolver to override the system DNS resolution.
@@ -759,6 +765,7 @@ public final class HttpClientUtil {
         private int defaultMaxTotal = 300;
         private int defaultMaxPreTotal = 200;
         private int maxRetry = 3;
+        private boolean useTls13 = false;
         
         /**
          * 取得最大重試次數
@@ -843,6 +850,14 @@ public final class HttpClientUtil {
         public void setDefaultMaxPreTotal(int defaultMaxPreTotal) {
             if (maxConnectTimeout < 5) maxConnectTimeout = 5; 
             this.defaultMaxPreTotal = defaultMaxPreTotal;
+        }
+
+        public boolean isUseTls13() {
+            return useTls13;
+        }
+
+        public void setUseTls13(boolean useTls13) {
+            this.useTls13 = useTls13;
         }
     }
     
