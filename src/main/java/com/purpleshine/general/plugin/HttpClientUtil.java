@@ -13,6 +13,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -99,6 +100,7 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
+import com.purpleshine.general.helpers.JsonUtil;
 import com.purpleshine.general.helpers.QueryUtil;
 
 public final class HttpClientUtil {
@@ -146,6 +148,18 @@ public final class HttpClientUtil {
         ,new BasicHeader("X-Requested-With", "XMLHttpRequest")
         ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
     };
+    
+    // 取得資料用 JSON
+    static public final Header[] DATA_JSON_HEADERS3 = {
+        new BasicHeader("Accept", "application/json; charset=utf-8")
+        ,new BasicHeader("Accept-Encoding", "gzip, deflate, sdch")
+        ,new BasicHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4")
+        ,new BasicHeader("Connection", "keep-alive")
+        ,new BasicHeader("Content-Type", "application/json")
+        ,new BasicHeader("X-Requested-With", "XMLHttpRequest")
+        ,new BasicHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
+    };
+    
     
     private Map<String, RequestConfig> requestConfigs = new HashMap<>();
     
@@ -242,9 +256,15 @@ public final class HttpClientUtil {
 
         // Create a registry of custom connection socket factories for supported
         // protocol schemes.
+        final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                SSLContexts.createDefault(),
+                config.getSupportTls(),
+                null,
+                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+        
         final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
             .register("http", PlainConnectionSocketFactory.INSTANCE)
-            .register("https", SSLConnectionSocketFactory.getSocketFactory())
+            .register("https", sslsf)
             .build();
 
         // Use custom DNS resolver to override the system DNS resolution.
@@ -554,6 +574,19 @@ public final class HttpClientUtil {
      * @throws ParseException
      * @throws IOException
      */
+    public ResponseData postJson(final String url, final Object json, final Header[] headers) throws ParseException, IOException {
+        return postJson(url, JsonUtil.convertObjectToJson(json), headers);
+    }
+    
+    /**
+     * Post Json字串
+     * @param url
+     * @param json
+     * @param headers
+     * @return
+     * @throws ParseException
+     * @throws IOException
+     */
     public ResponseData postJson(final String url, final String json, final Header[] headers) throws ParseException, IOException {
         final HttpPost httpPost = new HttpPost(url);
         httpPost.setEntity(new StringEntity(json, Consts.UTF_8));
@@ -733,6 +766,7 @@ public final class HttpClientUtil {
         private int defaultMaxTotal = 300;
         private int defaultMaxPreTotal = 200;
         private int maxRetry = 3;
+        private boolean useTls13 = false;
         
         /**
          * 取得最大重試次數
@@ -817,6 +851,24 @@ public final class HttpClientUtil {
         public void setDefaultMaxPreTotal(int defaultMaxPreTotal) {
             if (maxConnectTimeout < 5) maxConnectTimeout = 5; 
             this.defaultMaxPreTotal = defaultMaxPreTotal;
+        }
+
+        public boolean isUseTls13() {
+            return useTls13;
+        }
+
+        public void setUseTls13(boolean useTls13) {
+            this.useTls13 = useTls13;
+        }
+        
+        public String[] getSupportTls() {
+            var list = new LinkedList<String>();
+            list.add("TLSv1.2");   
+            if (useTls13) {
+                list.add("TLSv1.3");    
+            }
+            
+            return list.toArray(new String[list.size()]);
         }
     }
     

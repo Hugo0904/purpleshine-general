@@ -156,6 +156,16 @@ public final class TimeUtil {
     }
     
     /**
+     * 檢查現在是否為剛跨日時間
+     * @param intervalTime 與今日間隔多久內為剛跨日 (秒)
+     * @return
+     */
+    static public boolean isCrossHour(final String zoneId, final int hour, final long intervalTime) {
+        final boolean isCrossHour = getTodayDisappearTime(zoneId).getSeconds() <= (hour * 3600 + intervalTime);
+        return isCrossHour;
+    }
+    
+    /**
      * 垮當日哪個時區
      * @param zoneId
      * @param hour
