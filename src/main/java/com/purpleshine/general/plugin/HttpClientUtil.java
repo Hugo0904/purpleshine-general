@@ -13,6 +13,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -255,9 +256,9 @@ public final class HttpClientUtil {
 
         // Create a registry of custom connection socket factories for supported
         // protocol schemes.
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+        final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                 SSLContexts.createDefault(),
-                (config.useTls13 ? new String[] { "TLSv1.2", "TLSv1.3" } : new String[] { "TLSv1.2" }),
+                config.getSupportTls(),
                 null,
                 SSLConnectionSocketFactory.getDefaultHostnameVerifier());
         
@@ -858,6 +859,16 @@ public final class HttpClientUtil {
 
         public void setUseTls13(boolean useTls13) {
             this.useTls13 = useTls13;
+        }
+        
+        public String[] getSupportTls() {
+            var list = new LinkedList<String>();
+            list.add("TLSv1.2");   
+            if (useTls13) {
+                list.add("TLSv1.3");    
+            }
+            
+            return list.toArray(new String[list.size()]);
         }
     }
     
