@@ -22,22 +22,22 @@ import redis.clients.jedis.Tuple;
 
 
 @Singleton
-public class RedisUtil implements RedisClient, Switchable {
+public class Pedis implements RedisClient, Switchable {
     
-    static public final RedisUtil instance;
+    static public final Pedis instance;
     
     static {
-        instance = new RedisUtil(); 
+        instance = new Pedis(); 
     }
     
-    static public RedisUtil getInstance() {
+    static public Pedis getInstance() {
         return instance;
     }
     
     private final AtomicBoolean start = new AtomicBoolean();
     private volatile JedisPool pool;
     
-    private RedisUtil() {
+    private Pedis() {
         // singleton
     }
     
