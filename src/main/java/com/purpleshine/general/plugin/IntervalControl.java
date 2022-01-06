@@ -89,11 +89,24 @@ public final class IntervalControl {
 	 * @param millis
 	 * @return
 	 */
-	public boolean checkMeetAndResetInterval(final Object key, final long millis) {
+	public synchronized boolean checkMeetAndResetInterval(final Object key, final long millis) {
 		final boolean isMeet = isMeetInterval(key, millis);
 		if (isMeet) {
 			resetInterval(key);
 		}
 		return isMeet;
 	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param millis
+	 * @param timeout
+	 * @throws InterruptedException
+	 */
+	public void wait(final Object key, final long millis, final long timeout) throws InterruptedException {
+        while (!isMeetInterval(key, millis)) {
+            Thread.sleep(100);
+        }
+    }
 }
