@@ -121,7 +121,7 @@ public final class TimeUtil {
      */
     static public String plusZonedTime(final String pattern, final ZoneId zone, final long amountToAdd) {
         LocalDateTime now = LocalDateTime.now(zone).plus(amountToAdd, ChronoUnit.MILLIS);
-        return pattern == null ? now.toString() : ZonedDateTime.now().format(DateTimeFormatter.ofPattern(pattern));
+        return pattern == null ? now.toString() : now.atZone(zone).format(DateTimeFormatter.ofPattern(pattern));
     }
     
     /**
