@@ -114,6 +114,17 @@ public final class TimeUtil {
     }
     
     /**
+     * 取得當前時間日期重新加減後的時間(加入時區轉換)
+     * @param pattern
+     * @param amountToAdd
+     * @return
+     */
+    static public String plusZonedTime(final String pattern, final ZoneId zone, final long amountToAdd) {
+        LocalDateTime now = LocalDateTime.now(zone).plus(amountToAdd, ChronoUnit.MILLIS);
+        return pattern == null ? now.toString() : now.atZone(zone).format(DateTimeFormatter.ofPattern(pattern));
+    }
+    
+    /**
      * 取得當前時間日期重新加減後的時間
      * @param pattern
      * @param amountToAdd
